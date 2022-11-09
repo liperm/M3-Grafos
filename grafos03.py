@@ -11,12 +11,15 @@ class Tabela():
         self.tabelaTarefas = np.array(tarefas)
 
     def adicionaTarefa(self, tarefa):
-        np.append(self.tabelaTarefas, tarefa)
+        self.tabelaTarefas = np.append(self.tabelaTarefas, [tarefa])
+
+    def print(self):
+        print(self.tabelaTarefas)
 
 def criarTarefa():
-    id = input('Nome da tarefa:')
-    duracao = int(input('Duração da tarefa:'))
-    precedentes = input('Precedentes:')
+    id = input('Nome da tarefa: ')
+    duracao = int(input('Duração da tarefa: '))
+    precedentes = input('Precedentes: ')
         
     precedentes = list(precedentes)
 
@@ -32,6 +35,7 @@ try:
 
     tabela = Tabela()
     tabela.adicionaTarefa(tarefa)
+    tabela.print()
 
 except ValueError as error:
     print(error)
