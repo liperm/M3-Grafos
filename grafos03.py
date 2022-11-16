@@ -1,7 +1,7 @@
 import numpy as np
 
 class Tarefa:
-    def __init__(self, nome, duracao, precedentes):
+    def __init__(self, nome, duracao, precedentes: list):
         self.nome = nome
         self.duracao = duracao
         self.precedentes = precedentes
@@ -9,6 +9,7 @@ class Tarefa:
     
     def print(self):
         print(f'id: {self.id} nome: {self.nome} duracao: {self.duracao} precendentes: {self.precedentes}')
+
 
 class Tabela():
     def __init__(self):
@@ -24,29 +25,55 @@ class Tabela():
         for i in self.tabelaTarefas:
             i.print()
 
-def criarTarefa():
-    nome = input('Nome da tarefa: ')
+    def caminhoCritico(self):
+        #Encontra o ponto inicial da análise
+        for t in self.tabelaTarefas:
+            if len(t.precedentes) == 0:
+                tarefa =  t
+
+        lista = self.encontrarAdjacente(tarefa)
+        
+        return
+
+    #Retorna lista de tarefas que tem como precedente a tarefa passada por parametro
+    def encontrarAdjacente(self, tarefa):
+        listaTarefas = []
+
+        for t in self.tabelaTarefas:
+            if tarefa.id in t.precedentes:
+                listaTarefas.append(t)
+
+        return listaTarefas
+
+
+def criarTarefa(nome):
+    nome = nome.upper()
+    print(f'Tarefa: {nome}')
     duracao = int(input('Duração da tarefa: '))
-    precedentes = input('Precedentes: ')
+    precedentes = input('Precedentes: ').upper()
         
     precedentes = list(precedentes)
+    precedentesConvertidos = []
 
-    if(len(id) != 0 and duracao is not None):
-        tarefa = Tarefa(nome, duracao, precedentes)
+    for i in precedentes:
+        precedentesConvertidos.append(ord(i) - 65)
+
+    if(duracao is not None):
+        tarefa = Tarefa(nome, duracao, precedentesConvertidos)
         return tarefa
         
     else:
         raise ValueError('Nome ou duracao vazio')
 
 try:
-    t1 = Tarefa('a', 2, [])
-    t2 = Tarefa('b', 3, ['a'])
-    t3 = Tarefa('c', 4, ['a','b'])
+    t4 = criarTarefa('a')
+    t3 = criarTarefa('b')
+    t2 = criarTarefa('c')
     t = Tabela()
-    t.adicionaTarefa(t1)
-    t.adicionaTarefa(t2)
+    t.adicionaTarefa(t4)
     t.adicionaTarefa(t3)
-    t.print()
+    t.adicionaTarefa(t2)
+    t.caminhoCritico()
 
 except ValueError as error:
     print(error)
