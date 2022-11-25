@@ -28,22 +28,35 @@ class Tabela():
             i.print()
 
     def caminhoCritico(self):
+        nao_visitados = self.tabelaTarefas.copy()
+
         #Encontra o ponto inicial da análise
         for t in self.tabelaTarefas:
             if len(t.precedentes) == 0:
-                tarefa =  t
-
-        adjacentes = self.encontrarAdjacente(tarefa)
-
-        #adiciona os valores de chagada e saída de cada tarefa
-        for adjacente in adjacentes:
-            adjacente.chegada_minima = self.menorTempoDuracao(adjacente)
-            adjacente.saida_minima = adjacente.chegada_minima + adjacente.duracao   
-
-        for i in adjacentes:
-            i.print()
+                prox_tarefa =  t
         
-        return
+        del(nao_visitados[prox_tarefa.id])
+
+        while True:
+            tarefa = prox_tarefa
+            print('Tarefa:')
+            tarefa.print()
+            adjacentes = self.encontrarAdjacente(tarefa)
+
+            #adiciona os valores de chagada e saída de cada tarefa
+            for adjacente in adjacentes:
+                adjacente.chegada_minima = self.menorTempoDuracao(adjacente)
+                adjacente.saida_minima = adjacente.chegada_minima + adjacente.duracao
+
+            print('Adjacentes da tarefa:')
+            for i in adjacentes:
+                i.print()
+
+            if len(nao_visitados) == 0:
+                return
+
+            prox_tarefa = nao_visitados.pop(0)
+            
 
     #Retorna lista de tarefas que tem como precedente a tarefa passada por parametro
     def encontrarAdjacente(self, tarefa):
@@ -94,6 +107,7 @@ try:
     t.adicionaTarefa(t4)
     t.adicionaTarefa(t3)
     t.adicionaTarefa(t2)
+    t.print()
     t.caminhoCritico()
 
 except ValueError as error:
