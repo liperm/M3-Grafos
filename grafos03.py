@@ -6,7 +6,7 @@ class Tarefa:
         self.id = 0
         self.chegada_minima = 0
         self.chegada_maxima = 0
-        self.saida_minima = 0
+        self.saida_minima = duracao
         self.saida_maxima = 0
     
     def print(self):
@@ -35,8 +35,9 @@ class Tabela():
 
         adjacentes = self.encontrarAdjacente(tarefa)
 
+        #adiciona os valores de chagada e saída de cada tarefa
         for adjacente in adjacentes:
-            adjacente.chegada_minima = tarefa.duracao
+            adjacente.chegada_minima = self.menorTempoDuracao(adjacente)
             adjacente.saida_minima = adjacente.chegada_minima + adjacente.duracao   
 
         for i in adjacentes:
@@ -53,6 +54,17 @@ class Tabela():
                 listaTarefas.append(t)
 
         return listaTarefas
+
+    #Encontra o precedente de menor tempo da tarefa indicada. retorna o tempo
+    def menorTempoDuracao(self, tarefa):
+        menor_tempo = 1000000
+        for precedente in tarefa.precedentes:
+            if self.tabelaTarefas[precedente].saida_minima < menor_tempo:
+                menor_tempo = self.tabelaTarefas[precedente].saida_minima
+        
+        return menor_tempo
+
+
 
 
 def criarTarefa(nome):
