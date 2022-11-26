@@ -27,7 +27,7 @@ class Tabela():
         for i in self.tabelaTarefas:
             i.print()
 
-    def caminhoCritico(self):
+    def caminhoDeIda(self):
         nao_visitados = self.tabelaTarefas.copy()
 
         #Encontra o ponto inicial da análise
@@ -135,7 +135,7 @@ try:
     t.adicionaTarefa(t11)
     t.adicionaTarefa(t12)
 
-    t.caminhoCritico()
+    t.caminhoDeIda()
     t.print()
 
 except ValueError as error:
