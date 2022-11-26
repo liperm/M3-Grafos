@@ -39,18 +39,18 @@ class Tabela():
 
         while True:
             tarefa = prox_tarefa
-            print('Tarefa:')
-            tarefa.print()
+            #print('Tarefa:')
+            #tarefa.print()
             adjacentes = self.encontrarAdjacente(tarefa)
 
             #adiciona os valores de chagada e saída de cada tarefa
             for adjacente in adjacentes:
-                adjacente.chegada_minima = self.menorTempoDuracao(adjacente)
+                adjacente.chegada_minima = self.maiorTempoDuracao(adjacente)
                 adjacente.saida_minima = adjacente.chegada_minima + adjacente.duracao
 
-            print('Adjacentes da tarefa:')
-            for i in adjacentes:
-                i.print()
+            #print('Adjacentes da tarefa:')
+            #for i in adjacentes:
+             #   i.print()
 
             if len(nao_visitados) == 0:
                 return
@@ -77,8 +77,14 @@ class Tabela():
         
         return menor_tempo
 
-
-
+    #Encontra o precedente de maior tempo da tarefa indicada. retorna o tempo
+    def maiorTempoDuracao(self, tarefa):
+        maior_tempo = 0
+        for precedente in tarefa.precedentes:
+            if self.tabelaTarefas[precedente].saida_minima > maior_tempo:
+                maior_tempo = self.tabelaTarefas[precedente].saida_minima
+        
+        return maior_tempo
 
 def criarTarefa(nome):
     nome = nome.upper()
@@ -100,15 +106,37 @@ def criarTarefa(nome):
         raise ValueError('Nome ou duracao vazio')
 
 try:
-    t4 = Tarefa('A', 4, [])
-    t3 = Tarefa('B', 3, [0])
-    t2 = Tarefa('C', 4, [0, 1])
+    t0 = Tarefa('A', 0, [])
+    t1 = Tarefa('B', 6, [0])
+    t2 = Tarefa('C', 2, [0])
+    t3 = Tarefa('D', 3, [0])
+    t4 = Tarefa('E', 10, [1])
+    t5 = Tarefa('F', 3, [1])
+    t6 = Tarefa('G', 2, [2])
+    t7 = Tarefa('H', 4, [3])
+    t8 = Tarefa('I', 5, [5])
+    t9 = Tarefa('J', 8, [6, 7])
+    t10 = Tarefa('K', 6, [7])
+    t11 = Tarefa('L', 4, [9])
+    t12 = Tarefa('M', 2, [10])
+    
     t = Tabela()
-    t.adicionaTarefa(t4)
-    t.adicionaTarefa(t3)
+    t.adicionaTarefa(t0)
+    t.adicionaTarefa(t1)
     t.adicionaTarefa(t2)
-    t.print()
+    t.adicionaTarefa(t3)
+    t.adicionaTarefa(t4)
+    t.adicionaTarefa(t5)
+    t.adicionaTarefa(t6)
+    t.adicionaTarefa(t7)
+    t.adicionaTarefa(t8)
+    t.adicionaTarefa(t9)
+    t.adicionaTarefa(t10)
+    t.adicionaTarefa(t11)
+    t.adicionaTarefa(t12)
+
     t.caminhoCritico()
+    t.print()
 
 except ValueError as error:
     print(error)
