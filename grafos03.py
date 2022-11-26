@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 
 class Tarefa:
     def __init__(self, nome, duracao, precedentes: list):
@@ -11,9 +12,10 @@ class Tarefa:
         self.chegada_maxima = 0
         self.saida_minima = duracao
         self.saida_maxima = 0
+        self.fim = False
     
     def print(self):
-        print(f'id: {self.id} nome: {self.nome} duracao: {self.duracao} precendentes: {self.precedentes} chegada_minima: {self.chegada_minima} chegada_maxima: {self.chegada_maxima} saida_minima: {self.saida_minima} saida_maxima: {self.saida_maxima}')
+        print(f'id: {self.id} nome: {self.nome} duracao: {self.duracao} precendentes: {self.precedentes} chegada_minima: {self.chegada_minima} chegada_maxima: {self.chegada_maxima} saida_minima: {self.saida_minima} saida_maxima: {self.saida_maxima} Fim: {self.fim}' )
 
 
 class Tabela():
@@ -131,6 +133,30 @@ class Tabela():
         nx.draw_networkx_edges(grafo, pos, edgelist = listaConexoes, arrows = True, **arrow_options)
         plt.show()
 
+    def encontraFim(self):
+        listaAux = []
+        listaPrecedencia =[]
+        listaFim = []
+
+
+        for t in self.tabelaTarefas[1:]:
+            listaAux.append(t.precedentes)
+            
+
+        listaPrecedencia = list(np.concatenate((listaAux), axis=None))
+
+
+        listaPrecedencia = list(dict.fromkeys(listaPrecedencia))
+
+
+        for j in self.tabelaTarefas[1:]:
+            if j.id not in listaPrecedencia:
+                listaFim.append(j.id)
+                j.fim = True
+
+        
+        return listaFim
+
         
 
 def criarTarefa(nome):
@@ -181,6 +207,7 @@ try:
     t.adicionaTarefa(t12)
 
     t.caminhoDeIda()
+    t.encontraFim()
     t.print()
     t.printarGrafo()
 
