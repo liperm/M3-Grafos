@@ -117,6 +117,9 @@ class Tabela():
 
         listaConexoes = []
         for tarefa in self.tabelaTarefas[1:]:
+            if tarefa.fim:
+                coordenada = (tarefa.nome, 'Fim')
+                listaConexoes.append(coordenada)
             for precedente in tarefa.precedentes:
                 if precedente == 0:
                     coordenada = ('Init', tarefa.nome)
