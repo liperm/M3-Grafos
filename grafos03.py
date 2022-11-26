@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+import networkx as nx
+
 class Tarefa:
     def __init__(self, nome, duracao, precedentes: list):
         self.nome = nome
@@ -17,6 +20,9 @@ class Tabela():
     def __init__(self):
         self.tabelaTarefas = []
         self.id = 0
+
+        tarefa = Tarefa('Inicio', 0, [])
+        self.adicionaTarefa(tarefa)
 
     def adicionaTarefa(self, tarefa):
         tarefa.id = self.id
@@ -58,7 +64,7 @@ class Tabela():
             prox_tarefa = nao_visitados.pop(0)
             
 
-    #Retorna lista de tarefas que tem como precedente a tarefa passada por parametro
+    #Retorna listaConexoes de tarefas que tem como precedente a tarefa passada por parametro
     def encontrarAdjacente(self, tarefa):
         listaTarefas = []
 
@@ -86,6 +92,47 @@ class Tabela():
         
         return maior_tempo
 
+    def printarGrafo(self):
+        grafo = nx.Graph()
+
+        grafo.add_node('Init')
+
+        for i in range(0, len(self.tabelaTarefas) - 1):
+            grafo.add_node(chr(i + 65))
+
+        grafo.add_node('Fim')
+
+
+        node_options = {
+            'node_size' : 600,
+        }
+
+        arrow_options = {
+            'arrowstyle' : '-|>',
+            'arrowsize' : 25,
+            'width' : 1
+            }
+
+        listaConexoes = []
+        for tarefa in self.tabelaTarefas[1:]:
+            for precedente in tarefa.precedentes:
+                if precedente == 0:
+                    coordenada = ('Init', tarefa.nome)
+                else:
+                    coordenada = (chr(precedente + 64), tarefa.nome)
+
+                listaConexoes.append(coordenada)
+
+
+        plt.figure(figsize=(10, 8))
+        pos = nx.spring_layout(grafo)
+        nx.draw_networkx_nodes(grafo, pos, **node_options)
+        nx.draw_networkx_labels(grafo, pos)
+        nx.draw_networkx_edges(grafo, pos, edgelist = listaConexoes, arrows = True, **arrow_options)
+        plt.show()
+
+        
+
 def criarTarefa(nome):
     nome = nome.upper()
     print(f'Tarefa: {nome}')
@@ -96,7 +143,7 @@ def criarTarefa(nome):
     precedentesConvertidos = []
 
     for i in precedentes:
-        precedentesConvertidos.append(ord(i) - 65)
+        precedentesConvertidos.append(ord(i) - 64)
 
     if(duracao is not None):
         tarefa = Tarefa(nome, duracao, precedentesConvertidos)
@@ -106,22 +153,20 @@ def criarTarefa(nome):
         raise ValueError('Nome ou duracao vazio')
 
 try:
-    t0 = Tarefa('A', 0, [])
-    t1 = Tarefa('B', 6, [0])
-    t2 = Tarefa('C', 2, [0])
-    t3 = Tarefa('D', 3, [0])
-    t4 = Tarefa('E', 10, [1])
-    t5 = Tarefa('F', 3, [1])
-    t6 = Tarefa('G', 2, [2])
-    t7 = Tarefa('H', 4, [3])
-    t8 = Tarefa('I', 5, [5])
-    t9 = Tarefa('J', 8, [6, 7])
-    t10 = Tarefa('K', 6, [7])
-    t11 = Tarefa('L', 4, [9])
-    t12 = Tarefa('M', 2, [10])
+    t1 = Tarefa('A', 6, [0])
+    t2 = Tarefa('B', 2, [0])
+    t3 = Tarefa('C', 3, [0])
+    t4 = Tarefa('D', 10, [1])
+    t5 = Tarefa('E', 3, [1])
+    t6 = Tarefa('F', 2, [2])
+    t7 = Tarefa('G', 4, [3])
+    t8 = Tarefa('H', 5, [5])
+    t9 = Tarefa('I', 8, [6, 7])
+    t10 = Tarefa('J', 6, [7])
+    t11 = Tarefa('K', 4, [9])
+    t12 = Tarefa('L', 2, [10])
     
     t = Tabela()
-    t.adicionaTarefa(t0)
     t.adicionaTarefa(t1)
     t.adicionaTarefa(t2)
     t.adicionaTarefa(t3)
@@ -137,6 +182,7 @@ try:
 
     t.caminhoDeIda()
     t.print()
+    t.printarGrafo()
 
 except ValueError as error:
     print(error)
