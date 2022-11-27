@@ -129,18 +129,19 @@ class Tabela():
                 listaConexoes.append(coordenada)
 
         pos = nx.spring_layout(grafo)
-        shift = [0.1, 0]
+        shift = [0.05, 0]
         shifted_pos ={node: node_pos + shift for node, node_pos in pos.items()}
 
 
         labels = {}
         for tarefa in self.tabelaTarefas[1:]:
-            labels[tarefa.nome] = f'chegada minima: {str(tarefa.chegada_minima)}'
+            labels[tarefa.nome] = f'Inicio cedo: {str(tarefa.inicio_cedo)} Saida cedo: {str(tarefa.saida_cedo)}\nInicio tarde: {str(tarefa.inicio_tarde)} Saida tarde: {str(tarefa.saida_tarde)}'
 
-        plt.figure(figsize=(10, 8))
+        plt.figure(figsize=(10, 8), frameon=False)
+        plt.axis('off')
         nx.draw_networkx_nodes(grafo, pos, **node_options)
         nx.draw_networkx_labels(grafo, pos)
-        nx.draw_networkx_labels(grafo, shifted_pos, labels = labels, horizontalalignment="left")
+        nx.draw_networkx_labels(grafo, shifted_pos, labels = labels, horizontalalignment="left", verticalalignment='top')
         nx.draw_networkx_edges(grafo, pos, edgelist = listaConexoes, arrows = True, **arrow_options)
         plt.show()
 
