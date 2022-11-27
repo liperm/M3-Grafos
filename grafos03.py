@@ -13,6 +13,7 @@ class Tarefa:
         self.saida_cedo = duracao
         self.saida_tarde = 0
         self.fim = False
+        self.sucessor = None
     
     def print(self):
         print(f'id: {self.id} nome: {self.nome} duracao: {self.duracao} precendentes: {self.precedentes} inicio_cedo: {self.inicio_cedo} inicio_tarde: {self.inicio_tarde} saida_cedo: {self.saida_cedo} saida_tarde: {self.saida_tarde} Fim: {self.fim}' )
@@ -151,6 +152,7 @@ class Tabela():
         listaAux = []
         listaPrecedencia =[]
         listaFim = []
+        listaTarefaFinal = []
 
 
         for t in self.tabelaTarefas[1:]:
@@ -166,36 +168,57 @@ class Tabela():
         for j in self.tabelaTarefas[1:]:
             if j.id not in listaPrecedencia:
                 listaFim.append(j.id)
-                j.fim = True
+                #j.fim = True
 
+
+        tfim = Tarefa("Fim",0,listaFim)
+        tfim.fim =True
+        #tfim.inicio_tarde=tfim.saida_cedo
+        self.adicionaTarefa(tfim)
         
         return listaFim
 
     def caminhoDeVolta(self):
         tempoVoltaInicial =0 
-        listaFim = []
+        listaPrecedentes = []
+        listaTarefa = []
+        tarefaAtual = None
 
-        for t in self.tabelaTarefas[1:]:
-            for j in t.precedentes:
-                if j.saida_cedo > tempoVoltaInicial:
-                    tempoVoltaInicial = j.saida_cedo
+      #  for t in self.tabelaTarefas[1:]:
+      #      for j in t.precedentes:
+      #          if j.saida_cedo > tempoVoltaInicial:
+      #              tempoVoltaInicial = j.saida_cedo
                 
-        for t in self.tabelaTarefas[1:]:
-            if t.fim :
-                t.saida_tarde = tempoVoltaInicial
-                listaFim.append(t)
+      #  for t in self.tabelaTarefas[1:]:
+      #      if t.fim :
+      #          t.saida_tarde = tempoVoltaInicial
+       #         listaFim.append(t)
 
-        for t in listaFim:
-            return
+        listaTarefa = self.tabelaTarefas.copy()
+        tarefaAtual = listaTarefa.pop()
+        tarefaAtual.inicio_tarde = tarefaAtual.inicio_cedo
 
+        while True:
+            
+            if len(listaTarefa)>0:
+                listaPrecedentes = tarefaAtual.precedentes
+
+                for p in listaPrecedentes:
+                    if self.tabelaTarefas[p].saida_tarde <=tarefaAtual.inicio_tarde:
+                        self.tabelaTarefas[p].saida_tarde = tarefaAtual.inicio_tarde
+#tem que dar uma olhada nessa logica aqui
+                    self.tabelaTarefas[p].inicio_tarde = self.tabelaTarefas[p].saida_tarde - self.tabelaTarefas[p].duracao
+                    
+            else:
+                return
+
+            
+            tarefaAtual = listaTarefa.pop()
+
+            
         
-
-
-        return
     
-    def voltaRecursiva(self, tarefa):
 
-        return
 
         
 
@@ -246,10 +269,12 @@ try:
     t.adicionaTarefa(t11)
     t.adicionaTarefa(t12)
 
-    t.caminhoDeIda()
     t.encontraFim()
+    t.caminhoDeIda()
+    t.caminhoDeVolta()
+    
     t.print()
-    t.printarGrafo()
+   # t.printarGrafo()
 
 except ValueError as error:
     print(error)
