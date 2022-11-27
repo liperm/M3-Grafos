@@ -128,11 +128,19 @@ class Tabela():
 
                 listaConexoes.append(coordenada)
 
+        pos = nx.spring_layout(grafo)
+        shift = [0.1, 0]
+        shifted_pos ={node: node_pos + shift for node, node_pos in pos.items()}
+
+
+        labels = {}
+        for tarefa in self.tabelaTarefas[1:]:
+            labels[tarefa.nome] = f'chegada minima: {str(tarefa.chegada_minima)}'
 
         plt.figure(figsize=(10, 8))
-        pos = nx.spring_layout(grafo)
         nx.draw_networkx_nodes(grafo, pos, **node_options)
         nx.draw_networkx_labels(grafo, pos)
+        nx.draw_networkx_labels(grafo, shifted_pos, labels = labels, horizontalalignment="left")
         nx.draw_networkx_edges(grafo, pos, edgelist = listaConexoes, arrows = True, **arrow_options)
         plt.show()
 
