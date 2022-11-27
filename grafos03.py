@@ -8,14 +8,14 @@ class Tarefa:
         self.duracao = duracao
         self.precedentes = precedentes
         self.id = 0
-        self.chegada_minima = 0
-        self.chegada_maxima = 0
-        self.saida_minima = duracao
-        self.saida_maxima = 0
+        self.inicio_cedo = 0
+        self.inicio_tarde = 0
+        self.saida_cedo = duracao
+        self.saida_tarde = 0
         self.fim = False
     
     def print(self):
-        print(f'id: {self.id} nome: {self.nome} duracao: {self.duracao} precendentes: {self.precedentes} chegada_minima: {self.chegada_minima} chegada_maxima: {self.chegada_maxima} saida_minima: {self.saida_minima} saida_maxima: {self.saida_maxima} Fim: {self.fim}' )
+        print(f'id: {self.id} nome: {self.nome} duracao: {self.duracao} precendentes: {self.precedentes} inicio_cedo: {self.inicio_cedo} inicio_tarde: {self.inicio_tarde} saida_cedo: {self.saida_cedo} saida_tarde: {self.saida_tarde} Fim: {self.fim}' )
 
 
 class Tabela():
@@ -53,8 +53,8 @@ class Tabela():
 
             #adiciona os valores de chagada e saída de cada tarefa
             for adjacente in adjacentes:
-                adjacente.chegada_minima = self.maiorTempoDuracao(adjacente)
-                adjacente.saida_minima = adjacente.chegada_minima + adjacente.duracao
+                adjacente.inicio_cedo = self.maiorTempoDuracao(adjacente)
+                adjacente.saida_cedo = adjacente.inicio_cedo + adjacente.duracao
 
             #print('Adjacentes da tarefa:')
             #for i in adjacentes:
@@ -80,8 +80,8 @@ class Tabela():
     def menorTempoDuracao(self, tarefa):
         menor_tempo = 1000000
         for precedente in tarefa.precedentes:
-            if self.tabelaTarefas[precedente].saida_minima < menor_tempo:
-                menor_tempo = self.tabelaTarefas[precedente].saida_minima
+            if self.tabelaTarefas[precedente].saida_cedo < menor_tempo:
+                menor_tempo = self.tabelaTarefas[precedente].saida_cedo
         
         return menor_tempo
 
@@ -89,8 +89,8 @@ class Tabela():
     def maiorTempoDuracao(self, tarefa):
         maior_tempo = 0
         for precedente in tarefa.precedentes:
-            if self.tabelaTarefas[precedente].saida_minima > maior_tempo:
-                maior_tempo = self.tabelaTarefas[precedente].saida_minima
+            if self.tabelaTarefas[precedente].saida_cedo > maior_tempo:
+                maior_tempo = self.tabelaTarefas[precedente].saida_cedo
         
         return maior_tempo
 
