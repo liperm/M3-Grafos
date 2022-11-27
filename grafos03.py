@@ -94,6 +94,8 @@ class Tabela():
         
         return maior_tempo
 
+
+
     def printarGrafo(self):
         grafo = nx.Graph()
 
@@ -159,6 +161,32 @@ class Tabela():
 
         
         return listaFim
+
+    def caminhoDeVolta(self):
+        tempoVoltaInicial =0 
+        listaFim = []
+
+        for t in self.tabelaTarefas[1:]:
+            for j in t.precedentes:
+                if j.saida_cedo > tempoVoltaInicial:
+                    tempoVoltaInicial = j.saida_cedo
+                
+        for t in self.tabelaTarefas[1:]:
+            if t.fim :
+                t.saida_tarde = tempoVoltaInicial
+                listaFim.append(t)
+
+        for t in listaFim:
+            return
+
+        
+
+
+        return
+    
+    def voltaRecursiva(self, tarefa):
+
+        return
 
         
 
