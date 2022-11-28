@@ -274,7 +274,7 @@ try:
     t.caminhoDeVolta()
     
     t.print()
-   # t.printarGrafo()
+    t.printarGrafo()
 
 except ValueError as error:
     print(error)
