@@ -204,7 +204,7 @@ class Tabela():
                 listaPrecedentes = tarefaAtual.precedentes
 
                 for p in listaPrecedentes:
-                    if self.tabelaTarefas[p].saida_tarde <=tarefaAtual.inicio_tarde:
+                    if (self.tabelaTarefas[p].saida_tarde > tarefaAtual.inicio_tarde) or self.tabelaTarefas[p].saida_tarde == 0 :
                         self.tabelaTarefas[p].saida_tarde = tarefaAtual.inicio_tarde
 #tem que dar uma olhada nessa logica aqui
                     self.tabelaTarefas[p].inicio_tarde = self.tabelaTarefas[p].saida_tarde - self.tabelaTarefas[p].duracao
@@ -267,7 +267,7 @@ try:
     t.adicionaTarefa(t10)
     t.adicionaTarefa(t11)
     t.adicionaTarefa(t12)
-   # t.caminhoDeIda()
+    t.caminhoDeIda()
     t.encontraFim()
     t.caminhoDeIda()
     t.caminhoDeVolta()
@@ -289,7 +289,9 @@ try:
     tabela.adicionaTarefa(tarefa04)
     tabela.adicionaTarefa(tarefa05)
     tabela.adicionaTarefa(tarefa06)
+    tabela.encontraFim()
     tabela.caminhoDeIda()
+    tabela.caminhoDeVolta()
     tabela.print()
 
     print('\n')
@@ -322,7 +324,9 @@ try:
     tabela02.adicionaTarefa(tarefa18)
     tabela02.adicionaTarefa(tarefa19)
     tabela02.adicionaTarefa(tarefa20)
+    tabela02.encontraFim()
     tabela02.caminhoDeIda()
+    tabela02.caminhoDeVolta()
     tabela02.print()
 
 except ValueError as error:
