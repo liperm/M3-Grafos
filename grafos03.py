@@ -14,9 +14,10 @@ class Tarefa:
         self.saida_tarde = 0
         self.fim = False
         self.sucessor = None
+        self.folga = 0
     
     def print(self):
-        print(f'id: {self.id} nome: {self.nome} duracao: {self.duracao} precendentes: {self.precedentes} inicio_cedo: {self.inicio_cedo} inicio_tarde: {self.inicio_tarde} saida_cedo: {self.saida_cedo} saida_tarde: {self.saida_tarde} Fim: {self.fim}' )
+        print(f'id: {self.id} nome: {self.nome} duracao: {self.duracao} precendentes: {self.precedentes} inicio_cedo: {self.inicio_cedo} inicio_tarde: {self.inicio_tarde} saida_cedo: {self.saida_cedo} saida_tarde: {self.saida_tarde} Folga: {self.folga} Fim: {self.fim}' )
 
 
 class Tabela():
@@ -48,18 +49,12 @@ class Tabela():
 
         while True:
             tarefa = prox_tarefa
-            #print('Tarefa:')
-            #tarefa.print()
             adjacentes = self.encontrarAdjacente(tarefa)
 
             #adiciona os valores de chagada e saída de cada tarefa
             for adjacente in adjacentes:
                 adjacente.inicio_cedo = self.maiorTempoDuracao(adjacente)
                 adjacente.saida_cedo = adjacente.inicio_cedo + adjacente.duracao
-
-            #print('Adjacentes da tarefa:')
-            #for i in adjacentes:
-             #   i.print()
 
             if len(nao_visitados) == 0:
                 return
@@ -102,7 +97,7 @@ class Tabela():
 
         grafo.add_node('Init')
 
-        for i in range(0, len(self.tabelaTarefas) - 1):
+        for i in range(0, len(self.tabelaTarefas) - 2):
             grafo.add_node(chr(i + 65))
 
         grafo.add_node('Fim')
@@ -118,18 +113,27 @@ class Tabela():
             'width' : 1
             }
 
+        arrow_options_colored = {
+            'arrowstyle' : '-|>',
+            'arrowsize' : 25,
+            'width' : 1,
+            'edge_color' : 'red'
+            }
+
         listaConexoes = []
+        listaConexoesCriticas = []
         for tarefa in self.tabelaTarefas[1:]:
-            if tarefa.fim:
-                coordenada = (tarefa.nome, 'Fim')
-                listaConexoes.append(coordenada)
             for precedente in tarefa.precedentes:
                 if precedente == 0:
                     coordenada = ('Init', tarefa.nome)
                 else:
                     coordenada = (chr(precedente + 64), tarefa.nome)
-
-                listaConexoes.append(coordenada)
+                if(tarefa.folga == 0 and self.tabelaTarefas[precedente].folga == 0):
+                    listaConexoesCriticas.append(coordenada)
+                elif(tarefa.nome == 'Fim' and self.tabelaTarefas[precedente].folga == 0):
+                    listaConexoesCriticas.append(coordenada)
+                else:
+                    listaConexoes.append(coordenada)
 
         pos = nx.spring_layout(grafo)
         shift = [0.05, 0]
@@ -138,7 +142,7 @@ class Tabela():
 
         labels = {}
         for tarefa in self.tabelaTarefas[1:]:
-            labels[tarefa.nome] = f'Inicio cedo: {str(tarefa.inicio_cedo)} Saida cedo: {str(tarefa.saida_cedo)}\nInicio tarde: {str(tarefa.inicio_tarde)} Saida tarde: {str(tarefa.saida_tarde)}'
+            labels[tarefa.nome] = f'Duracao: {str(tarefa.duracao)}\nIC: {str(tarefa.inicio_cedo)}\nSC: {str(tarefa.saida_cedo)}\nIT: {str(tarefa.inicio_tarde)}\nST: {str(tarefa.saida_tarde)}\nFolga: {str(tarefa.folga)}'
 
         plt.figure(figsize=(10, 8), frameon=False)
         plt.axis('off')
@@ -146,6 +150,7 @@ class Tabela():
         nx.draw_networkx_labels(grafo, pos)
         nx.draw_networkx_labels(grafo, shifted_pos, labels = labels, horizontalalignment="left", verticalalignment='top')
         nx.draw_networkx_edges(grafo, pos, edgelist = listaConexoes, arrows = True, **arrow_options)
+        nx.draw_networkx_edges(grafo, pos, edgelist = listaConexoesCriticas, arrows = True, **arrow_options_colored)
         plt.show()
 
     def encontraFim(self):
@@ -179,20 +184,9 @@ class Tabela():
         return listaFim
 
     def caminhoDeVolta(self):
-        tempoVoltaInicial =0 
         listaPrecedentes = []
         listaTarefa = []
         tarefaAtual = None
-
-      #  for t in self.tabelaTarefas[1:]:
-      #      for j in t.precedentes:
-      #          if j.saida_cedo > tempoVoltaInicial:
-      #              tempoVoltaInicial = j.saida_cedo
-                
-      #  for t in self.tabelaTarefas[1:]:
-      #      if t.fim :
-      #          t.saida_tarde = tempoVoltaInicial
-       #         listaFim.append(t)
 
         listaTarefa = self.tabelaTarefas.copy()
         tarefaAtual = listaTarefa.pop()
@@ -215,24 +209,27 @@ class Tabela():
             
             tarefaAtual = listaTarefa.pop()
 
-            
-        
-    
-
-
+    def calcularFolga(self):
+        for tarefa in self.tabelaTarefas:
+            tarefa.folga = tarefa.saida_tarde - tarefa.saida_cedo
+        return
         
 
 def criarTarefa(nome):
     nome = nome.upper()
     print(f'Tarefa: {nome}')
-    duracao = int(input('Duração da tarefa: '))
-    precedentes = input('Precedentes: ').upper()
+    duracao = int(input('  Duração da tarefa: '))
+    precedentes = input('  Precedentes: ').upper()
         
     precedentes = list(precedentes)
     precedentesConvertidos = []
 
-    for i in precedentes:
-        precedentesConvertidos.append(ord(i) - 64)
+    if len(precedentes) == 0:
+        precedentesConvertidos.append(0)
+    
+    else:
+        for i in precedentes:
+            precedentesConvertidos.append(ord(i) - 64)
 
     if(duracao is not None):
         tarefa = Tarefa(nome, duracao, precedentesConvertidos)
@@ -241,93 +238,56 @@ def criarTarefa(nome):
     else:
         raise ValueError('Nome ou duracao vazio')
 
-try:
-    t1 = Tarefa('A', 6, [0])
-    t2 = Tarefa('B', 2, [0])
-    t3 = Tarefa('C', 3, [0])
-    t4 = Tarefa('D', 10, [1])
-    t5 = Tarefa('E', 3, [1])
-    t6 = Tarefa('F', 2, [2])
-    t7 = Tarefa('G', 4, [3])
-    t8 = Tarefa('H', 5, [5])
-    t9 = Tarefa('I', 8, [6, 7])
-    t10 = Tarefa('J', 6, [7])
-    t11 = Tarefa('K', 4, [9])
-    t12 = Tarefa('L', 2, [10])   
-    t = Tabela()
-    t.adicionaTarefa(t1)
-    t.adicionaTarefa(t2)
-    t.adicionaTarefa(t3)
-    t.adicionaTarefa(t4)
-    t.adicionaTarefa(t5)
-    t.adicionaTarefa(t6)
-    t.adicionaTarefa(t7)
-    t.adicionaTarefa(t8)
-    t.adicionaTarefa(t9)
-    t.adicionaTarefa(t10)
-    t.adicionaTarefa(t11)
-    t.adicionaTarefa(t12)
-    t.caminhoDeIda()
-    t.encontraFim()
-    t.caminhoDeIda()
-    t.caminhoDeVolta()
-    
-    t.print()
-    #t.printarGrafo()
-
-    print('\n')
+def criarTabela():
+    continua = True
+    acao = ''
+    nome = 'A'
     tabela = Tabela()
-    tarefa01 = Tarefa('A', 10, [0])
-    tarefa02 = Tarefa('B', 4, [1])
-    tarefa03 = Tarefa('C', 7, [1])
-    tarefa04 = Tarefa('D', 5, [3])
-    tarefa05 = Tarefa('E', 5, [2, 4])
-    tarefa06 = Tarefa('F', 2, [3])
-    tabela.adicionaTarefa(tarefa01)
-    tabela.adicionaTarefa(tarefa02)
-    tabela.adicionaTarefa(tarefa03)
-    tabela.adicionaTarefa(tarefa04)
-    tabela.adicionaTarefa(tarefa05)
-    tabela.adicionaTarefa(tarefa06)
-    tabela.encontraFim()
-    tabela.caminhoDeIda()
-    tabela.caminhoDeVolta()
-    tabela.print()
 
-    print('\n')
-    tabela02 = Tabela()
-    tarefa07 = Tarefa('A', 2, [0])
-    tarefa08 = Tarefa('B', 4, [1])
-    tarefa09 = Tarefa('C', 10, [2])
-    tarefa10 = Tarefa('D', 6, [3])
-    tarefa11 = Tarefa('E', 4, [3])
-    tarefa12 = Tarefa('F', 5, [5])
-    tarefa13 = Tarefa('G', 7, [4])
-    tarefa14 = Tarefa('H', 9, [5, 7])
-    tarefa15 = Tarefa('I', 7, [3])
-    tarefa16 = Tarefa('J', 8, [6, 9])
-    tarefa17 = Tarefa('K', 4, [10])
-    tarefa18 = Tarefa('L', 5, [10])
-    tarefa19 = Tarefa('M', 2, [8])
-    tarefa20 = Tarefa('N', 6, [11, 12])
-    tabela02.adicionaTarefa(tarefa07)
-    tabela02.adicionaTarefa(tarefa08)
-    tabela02.adicionaTarefa(tarefa09)
-    tabela02.adicionaTarefa(tarefa10)
-    tabela02.adicionaTarefa(tarefa11)
-    tabela02.adicionaTarefa(tarefa12)
-    tabela02.adicionaTarefa(tarefa13)
-    tabela02.adicionaTarefa(tarefa14)
-    tabela02.adicionaTarefa(tarefa15)
-    tabela02.adicionaTarefa(tarefa16)
-    tabela02.adicionaTarefa(tarefa17)
-    tabela02.adicionaTarefa(tarefa18)
-    tabela02.adicionaTarefa(tarefa19)
-    tabela02.adicionaTarefa(tarefa20)
-    tabela02.encontraFim()
-    tabela02.caminhoDeIda()
-    tabela02.caminhoDeVolta()
-    tabela02.print()
+    while continua:
+        tarefa = criarTarefa(nome)
+        tabela.adicionaTarefa(tarefa)
+        acao = input('Adicionar mais tarefas? [s/n]').upper()
+        
+        if acao != 'S':
+            return tabela
+        
+        nome = chr(ord(nome) + 1)
 
-except ValueError as error:
-    print(error)
+def main():
+    acao = '0'
+    tabelaCriada = False
+
+    while acao != '4':
+        if not tabelaCriada:
+            acao = input('1- Criar tabela de tarefas\n2- Sair\n')
+            print('\n')
+            match acao:
+                case '1':
+                    tabela = criarTabela()
+                    tabela.encontraFim()
+                    tabelaCriada = True
+                
+                case _ :
+                    return
+        else:
+            acao = input('1- Calcular Caminho Critico\n2- Mostrar grafo\n3- Sair\n')
+            print('\n')
+            match acao:
+                case '1':
+                    tabela.caminhoDeIda()
+                    tabela.caminhoDeVolta()
+                    tabela.calcularFolga()
+                    tabela.print()
+                
+                case '2':
+                    tabela.printarGrafo()
+
+                case _ :
+                    return
+
+        print('\n')
+
+if __name__ == '__main__':
+    main()
+    print(':)')
